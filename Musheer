@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo', 
+      home: const ImagePickerApp(),
+    );
+  }
+}
+
+class ImagePickerApp extends StatefulWidget {
+  const ImagePickerApp({super.key});
+
+  @override
+  State<ImagePickerApp> createState() => _ImagePickerAppState();
+}
+
+class _ImagePickerAppState extends State<ImagePickerApp> {
+  File? _image;
+  Future getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) return;
+    final imageTemporary = File(image.path);
+    setState(() {
+      this._image = imageTemporary;
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('pick an image'),
+        ),
+        body: Center(
+            child: Column(
+          children: [
+            Container(
+              width: 250,
+              height: 250,
+              child: _image != null
+                  ? Image.file(
+                      _image!,
+                      width: 250,
+                      height: 250,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset("images/IMG_9640.jpg"),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            CustomBoutton(
+              title: 'pick from Gallery',
+              icon: Icons.image_outlined,
+              onClick: () => getImage(ImageSource.gallery),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            CustomBoutton(
+              title: 'pick from camera',
+              icon: Icons.camera_alt,
+              onClick: () => getImage(ImageSource.camera),
+            ),
+          ],
+        )));
+  }
+}
+
+Widget CustomBoutton({
+  required String title,
+  required IconData icon,
+  required VoidCallback onClick,
+}) {
+  return Container(
+    width: 200,
+    child: ElevatedButton(
+      onPressed: onClick,
+      child: Row(
+        children: [
+          Icon(icon),
+          SizedBox(
+            width: 20,
+          ),
+          Text(title)
+        ],
+      ),
+    ),
+  );
+}
